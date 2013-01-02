@@ -6,11 +6,33 @@ from nexmomessage import NexmoMessage
 
 def main(function, args):
 
+    tmp = args
+    args = {}
+    for arg in tmp:
+        if (':' not in arg):
+            print ("Malformed arg:" + arg)
+            exit(1)
+        s = arg.split(":")
+        args[s[0]] = s[1]
+
+    print (args)
+
     r = "json"
     u = "XXXXXXXX"
     p = "XXXXXXXX"
-    f = "4444444444"
+    f = "444444444444"
+    t = "444444444444"
     m = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(20))
+    if ('key' in args):
+        u = args['key']
+    if ('pass' in args):
+        p = args['pass']
+    if ('to' in args):
+        t = args['to']
+    if ('from' in args):
+        f = args['from']
+    if ('message' in args):
+        m = args['message']
 
     msg = {'reqtype': r, 'password': p, 'from': f, 'to': t, 'username': u}
     req = {'password': p, 'username': u}
@@ -28,20 +50,20 @@ def main(function, args):
     elif (function == "pricing"):
         # pricing for country 'NL'
         req['type'] = 'pricing'
-        req['country'] = args[0]
+        req['country'] = args['country']
         print("request details: %s") % NexmoMessage(req).get_details()
         print NexmoMessage(req).send_request()
     elif (function == "search"):
         # searching for numbers for country 'NL'
         req['type'] = 'search'
-        req['country'] = args[0]
+        req['country'] = args['country']
         print("request details: %s") % NexmoMessage(req).get_details()
         print NexmoMessage(req).send_request()
     elif (function == "buy"):
         # buying number for country
         req['type'] = 'buy'
-        req['country'] = args[0]
-        req['msisdn'] = args[1]
+        req['country'] = args['country']
+        req['msisdn'] = args['msisdn']
         print("request details: %s") % NexmoMessage(req).get_details()
         print NexmoMessage(req).send_request()
     elif (function == "message"):
