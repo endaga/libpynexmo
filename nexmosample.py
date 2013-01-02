@@ -15,8 +15,6 @@ def main(function, args):
         s = arg.split(":")
         args[s[0]] = s[1]
 
-    print (args)
-
     r = "json"
     u = "XXXXXXXX"
     p = "XXXXXXXX"
@@ -68,10 +66,7 @@ def main(function, args):
         print NexmoMessage(req).send_request()
     elif (function == "message"):
         # text message
-        msg['text'] = m
         sms1 = NexmoMessage(msg)
-        print("SMS details: %s") % sms1.get_details()
-        m += " ktnxbye"
         sms1.set_text_info(m)
         print("SMS details: %s") % sms1.get_details()
         print sms1.send_request()
