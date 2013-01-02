@@ -162,9 +162,18 @@ class NexmoMessage:
 
     def send_request_json(self, request):
         url = request
-        req = urllib2.Request(url=url)
-        req.add_header('Accept', 'application/json')
-        return json.load(urllib2.urlopen(req))
+        header = { 'Accept' : 'application/json' }
+        req = None
+        if (self.sms['type'] == 'buy'): #POST
+            req = urllib2.Request(url, urllib.urlencode({}), header)
+        else: #GET
+            req = urllib2.Request(url, None, header)
+        
+        #some don't return json
+        if (self.sms['type'] in ['buy']):
+            return {'code' : urllib2.urlopen(req).getcode()}
+        else:
+            return json.load(urllib2.urlopen(req))
 
     def send_request_xml(self, request):
         return "XML request not implemented yet."
