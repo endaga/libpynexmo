@@ -86,8 +86,10 @@ class NexmoMessage:
                 return True
             elif self.sms['type'] in ['pricing', 'search'] and not self.sms.get('country'):
                 raise NexmoException("Pricing/search needs country")
-            elif self.sms['type'] in ['buy', 'update'] and (not self.sms.get('country') or not self.sms.get('msisdn')):
-                raise NexmoException("Buy or update needs country and msisdn")
+            elif self.sms['type'] in ['buy'] and (not self.sms.get('country') or not self.sms.get('msisdn')):
+                raise NexmoException("Update needs country and msisdn")
+            elif self.sms['type'] in ['update'] and (not self.sms.get('country') or not self.sms.get('msisdn') or not self.sms.get('moHttpUrl')):
+                raise NexmoException("Update needs country, msisdn, and moHttpUrl")
             return True
         # SMS logic, check Nexmo doc for details
         elif self.sms['type'] not in self.smstypes:
@@ -139,9 +141,9 @@ class NexmoMessage:
                        self.sms['country'], self.sms['msisdn'])
             # update
             elif self.sms['type'] == 'update':
-                self.request = "%s/number/update/%s/%s/%s/%s" \
+                self.request = "%s/number/update/%s/%s/%s/%s/?moHttpUrl=%s" \
                     % (BASEURL, self.sms['username'], self.sms['password'],
-                       self.sms['country'], self.sms['msisdn'])
+                       self.sms['country'], self.sms['msisdn'], self.sms['moHttpUrl'])
 
             return self.request
         else:
@@ -171,13 +173,13 @@ class NexmoMessage:
         url = request
         header = { 'Accept' : 'application/json' }
         req = None
-        if (self.sms['type'] == 'buy'): #POST
+        if (self.sms['type'] in ['buy', 'update']): #POST
             req = urllib2.Request(url, urllib.urlencode({}), header)
         else: #GET
             req = urllib2.Request(url, None, header)
         
         #some don't return json
-        if (self.sms['type'] in ['buy']):
+        if (self.sms['type'] in ['buy', 'update']):
             return {'code' : urllib2.urlopen(req).getcode()}
         else:
             return json.load(urllib2.urlopen(req))
