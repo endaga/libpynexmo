@@ -29,7 +29,8 @@ class NexmoMessage:
             'pricing',
             'numbers',
             'search',
-            'buy'
+            'buy',
+            'update'
         ]
         self.reqtypes = [
             'json',
@@ -85,8 +86,8 @@ class NexmoMessage:
                 return True
             elif self.sms['type'] in ['pricing', 'search'] and not self.sms.get('country'):
                 raise NexmoException("Pricing/search needs country")
-            elif self.sms['type'] in ['buy'] and (not self.sms.get('country') or not self.sms.get('msisdn')):
-                raise NexmoException("Buy needs country and msisdn")
+            elif self.sms['type'] in ['buy', 'update'] and (not self.sms.get('country') or not self.sms.get('msisdn')):
+                raise NexmoException("Buy or update needs country and msisdn")
             return True
         # SMS logic, check Nexmo doc for details
         elif self.sms['type'] not in self.smstypes:
@@ -131,11 +132,17 @@ class NexmoMessage:
                 self.request = "%s/number/search/%s/%s/%s" \
                     % (BASEURL, self.sms['username'], self.sms['password'],
                        self.sms['country'])
-            # search
+            # buy
             elif self.sms['type'] == 'buy':
                 self.request = "%s/number/buy/%s/%s/%s/%s" \
                     % (BASEURL, self.sms['username'], self.sms['password'],
                        self.sms['country'], self.sms['msisdn'])
+            # update
+            elif self.sms['type'] == 'update':
+                self.request = "%s/number/update/%s/%s/%s/%s" \
+                    % (BASEURL, self.sms['username'], self.sms['password'],
+                       self.sms['country'], self.sms['msisdn'])
+
             return self.request
         else:
             # standard requests
