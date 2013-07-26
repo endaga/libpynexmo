@@ -127,8 +127,15 @@ class NexmoMessage:
                        self.sms['country'])
             # numbers
             elif self.sms['type'] == 'numbers':
-                self.request = "%s/account/numbers/%s/%s" % (BASEURL,
+                self.request = "%s/account/numbers/%s/%s/?" % (BASEURL,
                     self.sms['username'], self.sms['password'])
+
+                attribs = []
+                for attrib in ['size', 'index', 'pattern']:
+                    if attrib in self.sms:
+                        attribs.append("%s=%s" % (attrib, self.sms[attrib]))
+
+                self.request += '&'.join(attribs)
             # search
             elif self.sms['type'] == 'search':
                 self.request = "%s/number/search/%s/%s/%s" \
