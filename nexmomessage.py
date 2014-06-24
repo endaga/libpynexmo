@@ -148,9 +148,14 @@ class NexmoMessage:
                        self.sms['country'], self.sms['msisdn'])
             # update
             elif self.sms['type'] == 'update':
-                self.request = "%s/number/update/%s/%s/%s/%s/?moHttpUrl=%s" \
+                self.request = "%s/number/update/%s/%s/%s/%s/?" \
                     % (BASEURL, self.sms['username'], self.sms['password'],
-                       self.sms['country'], self.sms['msisdn'], self.sms['moHttpUrl'])
+                       self.sms['country'], self.sms['msisdn'])
+
+                # we assume these have been properly escaped right now
+                optional = ['moHttpUrl', 'moSmppSysType', 'voiceCallbackType', 'voiceCallbackValue']
+                params = "&".join(["%s=%s" % (param, self.sms[param]) for param in optional if param in self.sms])
+                self.request += params
 
             return self.request
         else:
