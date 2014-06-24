@@ -184,7 +184,7 @@ class NexmoMessage:
             req = urllib2.Request(url, urllib.urlencode({}), header)
         else: #GET
             req = urllib2.Request(url, None, header)
-        
+
         #some don't return json
         if (self.sms['type'] in ['buy', 'update']):
             return {'code' : urllib2.urlopen(req).getcode()}
