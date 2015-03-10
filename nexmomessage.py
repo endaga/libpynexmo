@@ -30,12 +30,14 @@ class NexmoMessage:
             'numbers',
             'search',
             'buy',
+            'cancel',
             'update'
         ]
         self.reqtypes = [
             'json',
             'xml'
         ]
+        self.request = None
 
     def url_fix(self, s, charset='utf-8'):
         if isinstance(s, unicode):
@@ -87,7 +89,10 @@ class NexmoMessage:
             elif self.sms['type'] in ['pricing', 'search'] and not self.sms.get('country'):
                 raise NexmoException("Pricing/search needs country")
             elif self.sms['type'] in ['buy'] and (not self.sms.get('country') or not self.sms.get('msisdn')):
-                raise NexmoException("Update needs country and msisdn")
+                raise NexmoException("Buy needs country and msisdn")
+            elif (self.sms['type'] == 'cancel' and
+                  (not self.sms.get('country') or not self.sms.get('msisdn'))):
+                raise NexmoException("Cancel needs country and msisdn")
             elif self.sms['type'] in ['update'] and (not self.sms.get('country') or not self.sms.get('msisdn') or not self.sms.get('moHttpUrl')):
                 raise NexmoException("Update needs country, msisdn, and moHttpUrl")
             return True
@@ -146,6 +151,11 @@ class NexmoMessage:
                 self.request = "%s/number/buy/%s/%s/%s/%s" \
                     % (BASEURL, self.sms['username'], self.sms['password'],
                        self.sms['country'], self.sms['msisdn'])
+            # Cancel a number that was previously bought.
+            elif self.sms['type'] == 'cancel':
+                self.request = ("%s/number/cancel/%s/%s/%s/%s" % (
+                    BASEURL, self.sms['username'], self.sms['password'],
+                    self.sms['country'], self.sms['msisdn']))
             # update
             elif self.sms['type'] == 'update':
                 self.request = "%s/number/update/%s/%s/%s/%s/?" \
@@ -183,15 +193,17 @@ class NexmoMessage:
 
     def send_request_json(self, request):
         url = request
-        header = { 'Accept' : 'application/json' }
+        header = {'Accept' : 'application/json'}
         req = None
-        if (self.sms['type'] in ['buy', 'update']): #POST
+        # POST to the URL if we're buying, updating or canceling.  Otherwise
+        # GET.
+        if (self.sms['type'] in ['buy', 'update', 'cancel']):
             req = urllib2.Request(url, urllib.urlencode({}), header)
-        else: #GET
+        else:
             req = urllib2.Request(url, None, header)
 
-        #some don't return json
-        if (self.sms['type'] in ['buy', 'update']):
+        # Some methods don't return json.
+        if (self.sms['type'] in ['buy', 'update', 'cancel']):
             return {'code' : urllib2.urlopen(req).getcode()}
         else:
             return json.load(urllib2.urlopen(req))

@@ -64,6 +64,13 @@ def main(function, args):
         req['msisdn'] = args['msisdn']
         print("request details: %s") % NexmoMessage(req).get_details()
         print NexmoMessage(req).send_request()
+    elif function == 'cancel':
+        # Canceling an inbound number subscription.
+        req['type'] = 'cancel'
+        req['country'] = args['country']
+        req['msisdn'] = args['msisdn']
+        print("request details: %s") % NexmoMessage(req).get_details()
+        print NexmoMessage(req).send_request()
     elif (function == "message"):
         # text message
         sms1 = NexmoMessage(msg)
