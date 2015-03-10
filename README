@@ -1,3 +1,7 @@
-Simple python library to interact with Nexmo API
+A simple python library to interact with Nexmo API.
 
-See "nexmosample.py" for usage
+#### Operations
+
+* cancel: canceling an inbound number subscription
+([api docs](https://docs.nexmo.com/index.php/developer-api/number-cancel))
+* see `nexmosample.py` for more.
